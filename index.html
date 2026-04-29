@@ -2,43 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Smart Study Planner Pro</title>
+    <title>Pro Task Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Bad+Script&display=swap" rel="stylesheet">
 </head>
 <body>
-
-    <div class="glass-card">
-        <h1>Smart Study Planner</h1>
-        <div class="clock-section">
-            <h2 id="time">00:00:00</h2>
-            <h4 id="date">Loading Date...</h4>
-        </div>
-
-        <div class="input-section">
-            <input type="text" id="subject" placeholder="Subject">
-            <input type="text" id="task" placeholder="Specific Task">
-            <input type="number" id="times" placeholder="Mins">
-            <button id="addBtn" onclick="addTask()">Add Task</button>
-        </div>
-
-        <div class="progress-container">
-            <p id="progress">Completed 0 / 0</p>
-            <div class="progress-bar-bg">
-                <div id="progressBar" class="progress-bar-fill"></div>
+    <div class="main-container">
+        <section id="input-section">
+            <h1 id="header">Task Manager</h1>
+            <div class="input-group">
+                <input id="taskInput" type="text" placeholder="What needs to be done?">
+                <button id="addBtn" type="button">Add</button>
             </div>
-        </div>
+        </section>
 
-        <div id="taskContainer">
+        <section id="output-section">
+            <div id="empty-state">
+                <p>No tasks yet... Start your day by adding one!</p>
+            </div>
             <ul id="taskList"></ul>
-        </div>
+        </section>
     </div>
-
-    <div class="history-section">
-        <h2>Completed History</h2>
-        <ul id="taskHistory"></ul>
-    </div>
-
-    <script src="script.js"></script>
+    <script src="script.js" charset="utf-8"></script>
 </body>
 </html>
