@@ -1,87 +1,76 @@
-let tasks = JSON.parse(localStorage.getItem('studyTasks')) || [];
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-function updateTimeDate(){
-    const now = new Date();
-    document.getElementById("time").innerText = now.toLocaleTimeString("en-IN");
-    document.getElementById("date").innerText = now.toLocaleDateString("en-IN", { weekday: 'long', month: 'long', day: 'numeric' });
-}
-setInterval(updateTimeDate, 1000);
+const input = document.getElementById("taskInput");
+const addBtn = document.getElementById("addBtn");
+const taskList = document.getElementById("taskList");
+const emptyState = document.getElementById("empty-state");
 
-function addTask() {
-    let subject = document.getElementById("subject").value;
-    let task = document.getElementById("task").value;
-    let time = document.getElementById("times").value;
-
-    if(!subject || !task || !time) return alert("Fill all fields!");
-
-    const newTask = {
-        id: Date.now(),
-        subject,
-        task,
-        time,
-        completed: false
-    };
-
-    tasks.push(newTask);
-    saveAndRender();
-    
-    // Clear inputs
-    document.getElementById("subject").value = "";
-    document.getElementById("task").value = "";
-    document.getElementById("times").value = "";
-}
-
-function saveAndRender() {
-    localStorage.setItem('studyTasks', JSON.stringify(tasks));
+// Initial Load
+function init() {
     renderTasks();
 }
 
+function saveTasks() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    checkEmpty();
+}
+
 function renderTasks() {
-    const list = document.getElementById("taskList");
-    const history = document.getElementById("taskHistory");
-    list.innerHTML = "";
-    history.innerHTML = "";
-
-    let completedCount = 0;
-
-    tasks.forEach(t => {
+    taskList.innerHTML = "";
+    tasks.forEach((taskObj, index) => {
         const li = document.createElement("li");
-        li.innerHTML = `
-            <div>
-                <strong>${t.subject}</strong><br>
-                <small>${t.task} (${t.time}m)</small>
-            </div>
-            <div>
-                ${!t.completed ? `<button onclick="toggleTask(${t.id})" style="background:#22c55e; margin-right:5px">✔️</button>` : ''}
-                <button onclick="deleteTask(${t.id})" style="background:#ef4444">❌</button>
-            </div>
-        `;
+        li.className = "task";
 
-        if(t.completed) {
-            completedCount++;
-            history.appendChild(li);
-        } else {
-            list.appendChild(li);
-        }
+        const now = new Date(taskObj.date);
+        const day = now.toLocaleDateString("en-US", { weekday: "short" });
+        const time = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+
+        li.innerHTML = `
+            <div class="task-main">
+                <input type="checkbox" ${taskObj.completed ? 'checked' : ''} onchange="toggleComplete(${index})">
+                <p class="task-text ${taskObj.completed ? 'completed' : ''}">${taskObj.text}</p>
+                <button class="delete-btn" onclick="deleteTask(${index})">Delete</button>
+            </div>
+            <div class="dateSpan today">${day}, ${time}</div>
+        `;
+        taskList.appendChild(li);
+    });
+    checkEmpty();
+}
+
+function addTask() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    tasks.push({
+        text: text,
+        completed: false,
+        date: new Date().toISOString()
     });
 
-    const total = tasks.length;
-    document.getElementById("progress").innerText = `Completed ${completedCount} / ${total}`;
-    const percent = total === 0 ? 0 : (completedCount / total) * 100;
-    document.getElementById("progressBar").style.width = percent + "%";
+    input.value = "";
+    saveTasks();
+    renderTasks();
 }
 
-function toggleTask(id) {
-    const task = tasks.find(t => t.id === id);
-    task.completed = true;
-    saveAndRender();
+function deleteTask(index) {
+    tasks.splice(index, 1);
+    saveTasks();
+    renderTasks();
 }
 
-function deleteTask(id) {
-    tasks = tasks.filter(t => t.id !== id);
-    saveAndRender();
+function toggleComplete(index) {
+    tasks[index].completed = !tasks[index].completed;
+    saveTasks();
+    renderTasks();
 }
 
-// Initial Load
-renderTasks();
-updateTimeDate();
+function checkEmpty() {
+    emptyState.style.display = tasks.length === 0 ? "block" : "none";
+}
+
+// Event Listeners
+addBtn.addEventListener("click", addTask);
+input.addEventListener("keydown", (e) => { if (e.key === "Enter") addTask(); });
+
+init();
