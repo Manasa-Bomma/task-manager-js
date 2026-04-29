@@ -1,90 +1,76 @@
-:root {
-    --primary: #6366f1;
-    --success: #22c55e;
-    --bg: #0f172a;
-    --card: #1e293b;
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+const input = document.getElementById("taskInput");
+const addBtn = document.getElementById("addBtn");
+const taskList = document.getElementById("taskList");
+const emptyState = document.getElementById("empty-state");
+
+// Initial Load
+function init() {
+    renderTasks();
 }
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: var(--bg);
-    color: white;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
+function saveTasks() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    checkEmpty();
 }
 
-.glass-card {
-    background: var(--card);
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    width: 100%;
-    max-width: 500px;
+function renderTasks() {
+    taskList.innerHTML = "";
+    tasks.forEach((taskObj, index) => {
+        const li = document.createElement("li");
+        li.className = "task";
+
+        const now = new Date(taskObj.date);
+        const day = now.toLocaleDateString("en-US", { weekday: "short" });
+        const time = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+
+        li.innerHTML = `
+            <div class="task-main">
+                <input type="checkbox" ${taskObj.completed ? 'checked' : ''} onchange="toggleComplete(${index})">
+                <p class="task-text ${taskObj.completed ? 'completed' : ''}">${taskObj.text}</p>
+                <button class="delete-btn" onclick="deleteTask(${index})">Delete</button>
+            </div>
+            <div class="dateSpan today">${day}, ${time}</div>
+        `;
+        taskList.appendChild(li);
+    });
+    checkEmpty();
 }
 
-h1 { color: var(--primary); margin-top: 0; }
+function addTask() {
+    const text = input.value.trim();
+    if (!text) return;
 
-.input-section {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 20px;
+    tasks.push({
+        text: text,
+        completed: false,
+        date: new Date().toISOString()
+    });
+
+    input.value = "";
+    saveTasks();
+    renderTasks();
 }
 
-input {
-    background: #334155;
-    border: 1px solid #475569;
-    padding: 12px;
-    color: white;
-    border-radius: 8px;
-    outline: none;
+function deleteTask(index) {
+    tasks.splice(index, 1);
+    saveTasks();
+    renderTasks();
 }
 
-input:focus { border-color: var(--primary); }
-
-button {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    font-weight: bold;
-    transition: 0.3s;
+function toggleComplete(index) {
+    tasks[index].completed = !tasks[index].completed;
+    saveTasks();
+    renderTasks();
 }
 
-button:hover { opacity: 0.8; transform: translateY(-2px); }
-
-li {
-    list-style: none;
-    background: #334155;
-    margin: 10px 0;
-    padding: 15px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    animation: fadeIn 0.4s ease;
+function checkEmpty() {
+    emptyState.style.display = tasks.length === 0 ? "block" : "none";
 }
 
-.progress-bar-bg {
-    background: #334155;
-    height: 10px;
-    border-radius: 5px;
-    margin-top: 10px;
-    overflow: hidden;
-}
+// Event Listeners
+addBtn.addEventListener("click", addTask);
+input.addEventListener("keydown", (e) => { if (e.key === "Enter") addTask(); });
 
-.progress-bar-fill {
-    background: var(--success);
-    height: 100%;
-    width: 0%;
-    transition: 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+init();
