@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Smart Study Planner Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="glass-card">
+        <h1>Smart Study Planner</h1>
+        <div class="clock-section">
+            <h2 id="time">00:00:00</h2>
+            <h4 id="date">Loading Date...</h4>
+        </div>
+
+        <div class="input-section">
+            <input type="text" id="subject" placeholder="Subject">
+            <input type="text" id="task" placeholder="Specific Task">
+            <input type="number" id="times" placeholder="Mins">
+            <button id="addBtn" onclick="addTask()">Add Task</button>
+        </div>
+
+        <div class="progress-container">
+            <p id="progress">Completed 0 / 0</p>
+            <div class="progress-bar-bg">
+                <div id="progressBar" class="progress-bar-fill"></div>
+            </div>
+        </div>
+
+        <div id="taskContainer">
+            <ul id="taskList"></ul>
+        </div>
+    </div>
+
+    <div class="history-section">
+        <h2>Completed History</h2>
+        <ul id="taskHistory"></ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
